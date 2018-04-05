@@ -1,0 +1,13 @@
+# VARIABLES file
+
+
+# Network variables
+rpiAddress 	= 192.168.0.40
+routerAddress	= 192.168.0.1
+
+# Raspberry 
+rpiName		= rpiVPN
+
+
+# Client configuration name
+clientName	= ClientVPN
