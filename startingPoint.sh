@@ -18,5 +18,75 @@
 #       CREATED:  04/05/18 11:07:11 UTC
 #      REVISION:  ---
 #===============================================================================
+# Include our variable file
+source variables
+
+# Local variables
+folder="/etc/openvpn/easy-rsa"
+varsFile="$folder/vars"
+# varsFile="/tmp/vars"
+
+# Updating and installing OpenVPN
+#echo 'Running script'
+#
+#echo 'Updating, upgrading and installing OpenVPN'
+#apt-get update
+#apt-get upgrade
+#apt-get install -y openvpn easy-rsa
+#
+#echo 'Creating folder where to store RSA keys'
+mkdir -p /etc/openvpn/easy-rsa
+cp -R /usr/share/easy-rsa/* $folder
+
+
+# Modifying our easy-rsa/vars file with: export EASY_RSA="/etc/openvpn/easy-rsa"
+echo "Modifying $varsFile file"
+# replace all 15 line with our new variable. 
+sed -i '15s@.*@export EASY_RSA='"$folder"'@' $varsFile
+#openssl is not found dinamically so I forced it to be 1.0.0
+sed -i '29s/.*/export KEY_CONFIG=$EASY_RSA\/openssl-1.0.0.cnf/' $varsFile
+
+# Delete lines with default info
+sed -i '64,69d' $varsFile
+# Adding lines with our personal info.
+echo "Adding KEY values such COUNTRY in our $varsFile"
+sed -i "63a\export KEY_COUNTRY=\"$KEY_COUNTRY\"" $varsFile
+sed -i "64a\export KEY_PROVINCE=\"$KEY_PROVINCE\"" $varsFile
+sed -i "65a\export KEY_CITY=\"$KEY_CITY\"" $varsFile
+sed -i "66a\export KEY_ORG=\"$KEY_ORG\"" $varsFile
+sed -i "67a\export KEY_EMAIL=\"$KEY_EMAIL\"" $varsFile
+sed -i "68a\export KEY_OU=\"$KEY_OU\"" $varsFile
+
+
+# Build our certificate
+echo "Build our certificate!"
+source $folder/./vars
+$folder/./clean-all
+$folder/./build-ca
+
+# we now start building up our certs!
+echo "Server certificate is gonna be build"
+echo "PLEASE PRESS Y and leave the rest empty"
+$folder/./build-key-server $rpiName
+
+
+# Create keys
+echo "Diffie-Hellman key exchange enables the sharing of secret keys over a public server."
+$folder/./build-dh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -2,12 +2,21 @@
 
 
 # Network variables
-rpiAddress 	= 192.168.0.40
-routerAddress	= 192.168.0.1
+rpiAddress=192.168.0.40
+routerAddress=192.168.0.1
 
 # Raspberry 
-rpiName		= rpiVPN
+rpiName="rpiVPN"
 
 
 # Client configuration name
-clientName	= ClientVPN
+clientName="ClientVPN"
+
+
+# Variable to change our certification info
+KEY_COUNTRY="ES"
+KEY_PROVINCE="MA"
+KEY_CITY="Madrid"
+KEY_ORG="Casa"
+KEY_EMAIL="luis.ild"
+KEY_OU="Casa"
