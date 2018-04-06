@@ -19,7 +19,7 @@
 #      REVISION:  ---
 #===============================================================================
 # Include our variable file
-source variables
+source /home/pi/RaspberryVPNs/variables
 
 # Local variables
 folder="/etc/openvpn/easy-rsa"
@@ -49,7 +49,7 @@ sed -i '29s/.*/export KEY_CONFIG=$EASY_RSA\/openssl-1.0.0.cnf/' $varsFile
 # Delete lines with default info
 sed -i '64,69d' $varsFile
 # Adding lines with our personal info.
-echo "Adding KEY values such COUNTRY in our $varsFile"
+echo "Adding KEY values such COUNTRY in our $varsFile $KEY_COUNTRY"
 sed -i "63a\export KEY_COUNTRY=\"$KEY_COUNTRY\"" $varsFile
 sed -i "64a\export KEY_PROVINCE=\"$KEY_PROVINCE\"" $varsFile
 sed -i "65a\export KEY_CITY=\"$KEY_CITY\"" $varsFile
@@ -59,28 +59,38 @@ sed -i "68a\export KEY_OU=\"$KEY_OU\"" $varsFile
 
 
 # Build our certificate
-echo "Build our certificate!"
-source $folder/./vars
-$folder/./clean-all
-$folder/./build-ca
-
-# we now start building up our certs!
-echo "Server certificate is gonna be build"
-echo "PLEASE PRESS Y and leave the rest empty"
-$folder/./build-key-server $rpiName
-
-
-# Create keys
-echo "Diffie-Hellman key exchange enables the sharing of secret keys over a public server."
-$folder/./build-dh
-
-
+#echo "Build our certificate!"
+#source $folder/./vars
+#$folder/./clean-all
+#$folder/./build-ca
+#
+## we now start building up our certs!
+#echo "Server certificate is gonna be build"
+#echo "PLEASE PRESS Y and leave the rest empty"
+#$folder/./build-key-server $rpiName
+#
+#
+## Create keys
+#echo "Diffie-Hellman key exchange enables the sharing of secret keys over a public server."
+#$folder/./build-dh
 
 
+# Configure your OpenVPN server
+echo "We enable ipv4 forwarding"
+sed -i '28s/.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+sysctl -p
 
 
 
 
+# COnfiguring our firewall
+echo $rpiAddress
+iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j SNAT --to-source $rpiAddress
+iptables -t nat -v -L
+
+apt-get install -y iptables-persistent
+iptables-save > /etc/iptables/rules.v4
+cat /etc/iptables/rules.v4
 
 
 
