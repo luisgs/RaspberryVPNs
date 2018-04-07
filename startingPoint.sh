@@ -19,21 +19,23 @@
 #      REVISION:  ---
 #===============================================================================
 # Include our variable file
-source /home/pi/RaspberryVPNs/variables
+# this is like source command, we include variables file into this one
+. /home/pi/RaspberryVPNs/variables
 
 # Local variables
-folder="/etc/openvpn/easy-rsa"
+openVPNfolder="/etc/openvpn"
+folder="$openVPNfolder/easy-rsa"
 varsFile="$folder/vars"
 # varsFile="/tmp/vars"
 
 # Updating and installing OpenVPN
-#echo 'Running script'
+echo 'Running script'
 #
 #echo 'Updating, upgrading and installing OpenVPN'
-#apt-get update
-#apt-get upgrade
-#apt-get install -y openvpn easy-rsa
-#
+apt-get update
+apt-get upgrade
+apt-get install -y openvpn easy-rsa
+
 #echo 'Creating folder where to store RSA keys'
 mkdir -p /etc/openvpn/easy-rsa
 cp -R /usr/share/easy-rsa/* $folder
@@ -59,43 +61,55 @@ sed -i "68a\export KEY_OU=\"$KEY_OU\"" $varsFile
 
 
 # Build our certificate
-#echo "Build our certificate!"
-#source $folder/./vars
-#$folder/./clean-all
-#$folder/./build-ca
+echo "Build our certificate!"
+source $folder/./vars
+$folder/./clean-all
+$folder/./build-ca
 #
 ## we now start building up our certs!
-#echo "Server certificate is gonna be build"
-#echo "PLEASE PRESS Y and leave the rest empty"
-#$folder/./build-key-server $rpiName
+echo "Server certificate is gonna be build"
+echo "PLEASE PRESS Y and leave the rest empty"
+$folder/./build-key-server $rpiName
 #
 #
 ## Create keys
-#echo "Diffie-Hellman key exchange enables the sharing of secret keys over a public server."
-#$folder/./build-dh
+echo "Diffie-Hellman key exchange enables the sharing of secret keys over a public server."
+$folder/./build-dh
 
 
-# Configure your OpenVPN server
+## Configure your OpenVPN server
 echo "We enable ipv4 forwarding"
 sed -i '28s/.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 sysctl -p
-
-# COnfiguring our firewall
+#
+## COnfiguring our firewall
 echo "Configuring NAT and firewall routes"
-# We flushed all NAT entries!
+## We flushed all NAT entries!
 iptables -t nat -F
 iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j SNAT --to-source $rpiAddress
+## List all the entries of the iptables
 iptables -t nat -v -L
-# Making iptables persistence...
+#
+## Making iptables persistence...
 apt-get install -y iptables-persistent
 iptables-save > /etc/iptables/rules.v4
+## listing iptables rules...
 cat /etc/iptables/rules.v4
+#
+#
 
+# modifying config files
+# server.conf
+sed -e "s/rpiName/$rpiName/g" server.conf > $folder/keys/server.conf
+sed -ie "s/rpiAddres/$rpiAddress/g" $folder/keys/server.conf
+sed -ie "s/routerAddress/$routerAddress/g" $folder/keys/server.conf
 
+#Default
+sed -e "s/rpiURL/$rpiURL/g" Default.txt > $folder/keys/Default.txt
 
+# Move MkaeOVPN.sh script into openvpn folder
+chmod 0700 MakeOVPN.sh
+mv MakeOVPN.sh $folder/keys/
 
-
-
-
-
-
+systemctl status openvpn
+systemctl status openvpn@server.service

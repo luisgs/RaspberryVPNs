@@ -10,7 +10,7 @@ dev tun
 
 proto udp
 
-remote your-dns.dynamic-dns.net 1194 ## CHANGE your-dns.dynamic-dns.net TO THE DOMAIN YOU CREATED IN YOUR CHANGEIP.COM ACCOUNT (DO NOT prefix with www.)
+remote rpiURL 1194 
 
 resolv-retry infinite
 
