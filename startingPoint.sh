@@ -80,14 +80,13 @@ echo "We enable ipv4 forwarding"
 sed -i '28s/.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 sysctl -p
 
-
-
-
 # COnfiguring our firewall
-echo $rpiAddress
+echo "Configuring NAT and firewall routes"
+# We flushed all NAT entries!
+iptables -t nat -F
 iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j SNAT --to-source $rpiAddress
 iptables -t nat -v -L
-
+# Making iptables persistence...
 apt-get install -y iptables-persistent
 iptables-save > /etc/iptables/rules.v4
 cat /etc/iptables/rules.v4
