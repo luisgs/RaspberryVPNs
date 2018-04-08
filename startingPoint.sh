@@ -75,7 +75,7 @@ $folder/./build-key-server $rpiName
 ## Create keys
 echo "Diffie-Hellman key exchange enables the sharing of secret keys over a public server."
 $folder/./build-dh
-
+openvpn --genkey --secret /etc/openvpn/easy-rsa/keys/ta.key
 
 ## Configure your OpenVPN server
 echo "We enable ipv4 forwarding"
@@ -100,9 +100,9 @@ cat /etc/iptables/rules.v4
 
 # modifying config files
 # server.conf
-sed -e "s/rpiName/$rpiName/g" server.conf > $folder/keys/server.conf
-sed -ie "s/rpiAddres/$rpiAddress/g" $folder/keys/server.conf
-sed -ie "s/routerAddress/$routerAddress/g" $folder/keys/server.conf
+sed -e "s/rpiName/$rpiName/g" server.conf > $folder/server.conf
+sed -ie "s/rpiAddres/$rpiAddress/g" $folder/server.conf
+sed -ie "s/routerAddress/$routerAddress/g" $folder/server.conf
 
 #Default
 sed -e "s/rpiURL/$rpiURL/g" Default.txt > $folder/keys/Default.txt
@@ -111,5 +111,7 @@ sed -e "s/rpiURL/$rpiURL/g" Default.txt > $folder/keys/Default.txt
 chmod 0700 MakeOVPN.sh
 mv MakeOVPN.sh $folder/keys/
 
+systemctl start openvpn
 systemctl status openvpn
+systemctl start openvpn@server.service
 systemctl status openvpn@server.service
