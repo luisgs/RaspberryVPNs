@@ -115,3 +115,12 @@ systemctl start openvpn
 systemctl status openvpn
 systemctl start openvpn@server.service
 systemctl status openvpn@server.service
+
+# assuming that everything goes well... we fire up openvpn service at boot
+#write out current crontab
+crontab -l > cron.tmp
+#echo new cron into cron file
+echo "@reboot sleep 10 && systemctl start openvpn@server.service" >> cron.tmp
+#install new cron file
+crontab cron.tmp
+rm cron.tmp
