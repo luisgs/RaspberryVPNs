@@ -8,7 +8,7 @@ client
 
 dev tun
 
-proto udp
+proto udp4
 
 remote rpiURL 1194 
 
