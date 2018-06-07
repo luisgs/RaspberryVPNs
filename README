@@ -1,1 +1,9 @@
-Hola caracola!
+
+
+This script put together all the necessary commands to configure a VPN server and client keys for a Raspberry.
+
+Most of the commands has been taken from different tutorial.
+
+THere is only need to configure config file and write down your specfic details.
+Execute and pay attention to each of the messages.
+
